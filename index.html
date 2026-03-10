@@ -18,6 +18,19 @@
         header { text-align: center; border-bottom: 1px solid var(--gold); margin-bottom: 30px; }
         h1 { font-family: 'Georgia', serif; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; margin: 10px 0; }
         
+        /* Category Headers */
+        .category-header {
+            grid-column: 1 / -1;
+            color: var(--gold);
+            font-family: 'Georgia', serif;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #333;
+            padding: 40px 0 10px 0;
+            margin-bottom: 10px;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -63,55 +76,21 @@
             text-align: center; color: var(--gold); padding: 80px 50px; 
             font-family: 'Georgia', serif; font-style: italic; letter-spacing: 2px; font-size: 1.2rem;
         }
-
         .loader-container { width: 120px; height: 100px; margin: 0 auto 20px; position: relative; }
-
         .glass {
             position: absolute; bottom: 10px; left: 50%;
-            width: 38px; height: 40px;
-            border: 2px solid var(--gold);
-            border-top: none;
-            border-radius: 2px 2px 4px 4px;
-            border-bottom-width: 5px; 
-            transform: translateX(-50%);
-            overflow: hidden;
+            width: 38px; height: 40px; border: 2px solid var(--gold); border-top: none;
+            border-radius: 2px 2px 4px 4px; border-bottom-width: 5px; 
+            transform: translateX(-50%); overflow: hidden;
         }
-
-        .ice {
-            position: absolute; width: 10px; height: 10px;
-            border: 1px solid var(--gold); opacity: 0.6;
-        }
+        .ice { position: absolute; width: 10px; height: 10px; border: 1px solid var(--gold); opacity: 0.6; }
         .ice1 { bottom: 5px; left: 4px; transform: rotate(15deg); }
         .ice2 { bottom: 6px; right: 4px; transform: rotate(-20deg); }
         .ice3 { bottom: 14px; left: 10px; transform: rotate(45deg); }
-
-        .glass-fill {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            background: var(--gold); height: 0%;
-            animation: fillGlass 1.5s ease-in-out infinite;
-        }
-
-        .shaker {
-            position: absolute; top: 5px; left: 10px;
-            width: 28px; height: 48px;
-            background: var(--gold); border-radius: 3px 3px 6px 6px;
-            transform-origin: top right;
-            animation: pourAction 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pourAction {
-            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-            20% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-            /* Moved shaker further left to 26px */
-            45%, 75% { transform: translate(26px, 5px) rotate(115deg); opacity: 1; }
-            95%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-        }
-
-        @keyframes fillGlass {
-            0%, 45% { height: 0%; }
-            75%, 90% { height: 50%; }
-            100% { height: 0%; }
-        }
+        .glass-fill { position: absolute; bottom: 0; left: 0; right: 0; background: var(--gold); height: 0%; animation: fillGlass 1.5s ease-in-out infinite; }
+        .shaker { position: absolute; top: 5px; left: 10px; width: 28px; height: 48px; background: var(--gold); border-radius: 3px 3px 6px 6px; transform-origin: top right; animation: pourAction 1.5s ease-in-out infinite; }
+        @keyframes pourAction { 0% { transform: translate(0, 0) rotate(0deg); opacity: 0; } 20% { transform: translate(0, 0) rotate(0deg); opacity: 1; } 45%, 75% { transform: translate(26px, 5px) rotate(115deg); opacity: 1; } 95%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0; } }
+        @keyframes fillGlass { 0%, 45% { height: 0%; } 75%, 90% { height: 50%; } 100% { height: 0%; } }
 
         .admin-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; padding: 20px; display: flex; justify-content: center; gap: 25px; border-top: 1px solid var(--gold); z-index: 100; }
         .admin-bar label { color: var(--gold); font-weight: bold; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
@@ -165,13 +144,14 @@
                 const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 const clean = (val) => val ? val.replace(/"/g, '').trim() : "";
                 return {
-                    name: clean(cols[0]),
-                    needs: clean(cols[1]).toLowerCase(),
-                    method: clean(cols[2]),
-                    glass: clean(cols[3]),
-                    garnish: clean(cols[4]),
-                    specs: clean(cols[5]).split('|'),
-                    note: clean(cols[6])
+                    category: clean(cols[0]), // NEW: Pulls from Column A
+                    name: clean(cols[1]),
+                    needs: clean(cols[2]).toLowerCase(),
+                    method: clean(cols[3]),
+                    glass: clean(cols[4]),
+                    garnish: clean(cols[5]),
+                    specs: clean(cols[6]).split('|'),
+                    note: clean(cols[7])
                 };
             }).filter(c => c.name !== "");
 
@@ -191,11 +171,22 @@
         const hasPineapple = document.getElementById('checkPineapple').checked;
         menu.innerHTML = '';
         
+        let lastCategory = "";
+
         cocktails.forEach(d => {
             let isAvailable = true;
             if (d.needs.includes('lime') && !hasLime) isAvailable = false;
             if (d.needs.includes('lemon') && !hasLemon) isAvailable = false;
             if (d.needs.includes('pineapple') && !hasPineapple) isAvailable = false;
+
+            // Add Header if category changes
+            if (d.category !== lastCategory) {
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.innerText = d.category;
+                menu.appendChild(header);
+                lastCategory = d.category;
+            }
 
             const container = document.createElement('div');
             container.className = `card-container ${isAvailable ? '' : 'unavailable'}`;
