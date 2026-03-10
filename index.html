@@ -58,7 +58,7 @@
         .spec-list { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; line-height: 1.5; color: #fff; }
         .spec-list li { border-bottom: 1px dotted #444; }
 
-        /* --- UPDATED LOADING ANIMATION --- */
+        /* --- LOADING ANIMATION --- */
         #statusDisplay { 
             text-align: center; color: var(--gold); padding: 80px 50px; 
             font-family: 'Georgia', serif; font-style: italic; letter-spacing: 2px; font-size: 1.2rem;
@@ -66,18 +66,17 @@
 
         .loader-container { width: 120px; height: 100px; margin: 0 auto 20px; position: relative; }
 
-        /* The Rocks Glass with Ice */
         .glass {
             position: absolute; bottom: 10px; left: 50%;
             width: 38px; height: 40px;
             border: 2px solid var(--gold);
             border-top: none;
             border-radius: 2px 2px 4px 4px;
-            border-bottom-width: 5px; /* Heavy bottom like a rocks glass */
+            border-bottom-width: 5px; 
             transform: translateX(-50%);
+            overflow: hidden;
         }
 
-        /* Ice Cubes */
         .ice {
             position: absolute; width: 10px; height: 10px;
             border: 1px solid var(--gold); opacity: 0.6;
@@ -92,7 +91,6 @@
             animation: fillGlass 1.5s ease-in-out infinite;
         }
 
-        /* The Shaker Tin - Adjusted left shift */
         .shaker {
             position: absolute; top: 5px; left: 10px;
             width: 28px; height: 48px;
@@ -101,29 +99,16 @@
             animation: pourAction 1.5s ease-in-out infinite;
         }
 
-        .stream {
-            position: absolute; top: 0; right: 0;
-            width: 3px; height: 0;
-            background: var(--gold);
-            animation: streamAction 1.5s ease-in-out infinite;
-        }
-
         @keyframes pourAction {
             0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
             20% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-            /* Changed translate from 38px to 32px to move pour to the left */
-            45%, 75% { transform: translate(32px, 5px) rotate(115deg); opacity: 1; }
+            /* Moved shaker further left to 26px */
+            45%, 75% { transform: translate(26px, 5px) rotate(115deg); opacity: 1; }
             95%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
         }
 
-        @keyframes streamAction {
-            0%, 48% { height: 0; opacity: 0; }
-            52%, 70% { height: 52px; opacity: 1; }
-            75%, 100% { height: 0; opacity: 0; }
-        }
-
         @keyframes fillGlass {
-            0%, 55% { height: 0%; }
+            0%, 45% { height: 0%; }
             75%, 90% { height: 50%; }
             100% { height: 0%; }
         }
@@ -139,7 +124,7 @@
 
 <div id="statusDisplay">
     <div class="loader-container">
-        <div class="shaker"><div class="stream"></div></div>
+        <div class="shaker"></div>
         <div class="glass">
             <div class="ice ice1"></div>
             <div class="ice ice2"></div>
