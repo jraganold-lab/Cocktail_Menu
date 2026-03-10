@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Private Bar</title>
+    <style>
+        :root { --gold: #d4af37; --bg: #121212; --card-bg: #1e1e1e; --text: #e0e0e0; }
+        
+        body { 
+            font-family: 'Helvetica Neue', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px 20px 140px; 
+        }
+
+        header { text-align: center; border-bottom: 1px solid var(--gold); margin-bottom: 30px; }
+        h1 { font-family: 'Georgia', serif; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; margin: 10px 0; }
+        
+        /* Smooth Fade-in Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .menu-grid { 
+            display: none; 
+            opacity: 0;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 25px; 
+            max-width: 1200px; 
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* 3D Flip Container */
+        .card-container { perspective: 1000px; height: 220px; cursor: pointer; }
+        .card-inner { 
+            position: relative; width: 100%; height: 100%; 
+            transition: transform 0.6s; transform-style: preserve-3d; 
+        }
+        .card-container.flipped .card-inner { transform: rotateY(180deg); }
+        .card-container.unavailable { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
+
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%; 
+            backface-visibility: hidden;
+            background: var(--card-bg); border: 1px solid #333; border-radius: 12px;
+            padding: 20px; box-sizing: border-box; overflow: hidden;
+        }
+
+        .card-back { transform: rotateY(180deg); border-color: var(--gold); }
+
+        h3 { color: var(--gold); margin: 0 0 10px 0; font-family: 'Georgia', serif; font-size: 1.4rem; }
+        .public-note { font-style: italic; color: #999; font-size: 0.95rem; line-height: 1.4; }
+        
+        .tag-row { margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; background: #333; color: var(--gold); border: 1px solid var(--gold); text-transform: uppercase; }
+        
+        .spec-list { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; line-height: 1.5; color: #fff; }
+        .spec-list li { border-bottom: 1px dotted #444; }
+
+        /* --- LOADING ANIMATION STYLES --- */
+        #statusDisplay { 
+            text-align: center; 
+            color: var(--gold); 
+            padding: 80px 50px; 
+            font-family: 'Georgia', serif; 
+            font-style: italic; 
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+        }
+
+        .loader-container {
+            width: 120px;
+            height: 100px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        /* The Glass */
+        .glass {
+            position: absolute; bottom: 10px; left: 50%;
+            width: 34px; height: 38px;
+            border: 2px solid var(--gold);
+            border-top: none;
+            border-radius: 2px 2px 6px 6px;
+            transform: translateX(-50%);
+            overflow: hidden; /* Clips the liquid fill */
+        }
+
+        /* Liquid filling the glass */
+        .glass::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: var(--gold);
+            height: 0%;
+            animation: fillGlass 1.5s ease-in-out infinite;
+        }
+
+        /* The Shaker Tin */
+        .shaker {
+            position: absolute; top: 5px; left: 10px;
+            width: 30px; height: 50px;
+            background: var(--gold);
+            border-radius: 4px 4px 8px 8px;
+            transform-origin: top right;
+            animation: pourAction 1.5s ease-in-out infinite;
+        }
+
+        /* The Pouring Stream */
+        .stream {
+            position: absolute; top: 0; right: 0;
+            width: 3px; height: 0;
+            background: var(--gold);
+            animation: streamAction 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pourAction {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            20% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+            45%, 75% { transform: translate(38px, 5px) rotate(115deg); opacity: 1; }
+            95%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+        }
+
+        @keyframes streamAction {
+            0%, 48% { height: 0; opacity: 0; }
+            52%, 70% { height: 50px; opacity: 1; }
+            75%, 100% { height: 0; opacity: 0; }
+        }
+
+        @keyframes fillGlass {
+            0%, 55% { height: 0%; }
+            75%, 90% { height: 60%; }
+            100% { height: 0%; }
+        }
+
+        /* Admin Footer */
+        .admin-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; padding: 20px; display: flex; justify-content: center; gap: 25px; border-top: 1px solid var(--gold); z-index: 100; }
+        .admin-bar label { color: var(--gold); font-weight: bold; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
+        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); }
+    </style>
+</head>
+<body>
+
+<header><h1>The Private Bar</h1></header>
+
+<div id="statusDisplay">
+    <div class="loader-container">
+        <div class="shaker">
+            <div class="stream"></div>
+        </div>
+        <div class="glass"></div>
+    </div>
+    <div>Mixing the drinks...</div>
+</div>
+
+<div class="menu-grid" id="menu"></div>
+
+<div class="admin-bar">
+    <label><input type="checkbox" id="checkLime" checked onchange="renderMenu()"> LIME</label>
+    <label><input type="checkbox" id="checkLemon" checked onchange="renderMenu()"> LEMON</label>
+    <label><input type="checkbox" id="checkPineapple" checked onchange="renderMenu()"> PINEAPPLE</label>
+    <button onclick="fetchCocktails()" style="background:var(--gold); border:none; padding:5px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">SYNC</button>
+</div>
+
+<script>
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR5ACf_DF6gWGmXRVehkDrDRLcTWEG7evXGbHDk0_EGbUNpK2Owg9-r4_rZGrKlDub0H_mQNFTnxpi7/pub?output=csv';
+
+    let cocktails = [];
+
+    async function fetchCocktails() {
+        const status = document.getElementById('statusDisplay');
+        const menu = document.getElementById('menu');
+        
+        // Hide menu and show loading animation
+        menu.style.display = 'none';
+        menu.style.opacity = '0';
+        status.style.display = 'block';
+
+        try {
+            const response = await fetch(SHEET_URL + '&cb=' + Date.now());
+            const csvText = await response.text();
+            
+            // Forced 1.5 second "Mixing" delay for effect
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            const rows = csvText.split('\n').slice(1);
+            
+            cocktails = rows.map(row => {
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                const clean = (val) => val ? val.replace(/"/g, '').trim() : "";
+                return {
+                    name: clean(cols[0]),
+                    needs: clean(cols[1]).toLowerCase(),
+                    method: clean(cols[2]),
+                    glass: clean(cols[3]),
+                    garnish: clean(cols[4]),
+                    specs: clean(cols[5]).split('|'),
+                    note: clean(cols[6])
+                };
+            }).filter(c => c.name !== "");
+
+            // Hide loader and reveal menu grid
+            status.style.display = 'none';
+            menu.style.display = 'grid';
+            
+            // Slight delay before opacity change to ensure animation triggers on iPad
+            setTimeout(() => {
+                menu.style.opacity = '1';
+            }, 50);
+
+            renderMenu();
+        } catch (err) {
+            status.innerHTML = "Sync Error. Check Connection.";
+        }
+    }
+
+    function renderMenu() {
+        const menu = document.getElementById('menu');
+        const hasLime = document.getElementById('checkLime').checked;
+        const hasLemon = document.getElementById('checkLemon').checked;
+        const hasPineapple = document.getElementById('checkPineapple').checked;
+        
+        menu.innerHTML = '';
+        
+        cocktails.forEach(d => {
+            let isAvailable = true;
+            if (d.needs.includes('lime') && !hasLime) isAvailable = false;
+            if (d.needs.includes('lemon') && !hasLemon) isAvailable = false;
+            if (d.needs.includes('pineapple') && !hasPineapple) isAvailable = false;
+
+            const container = document.createElement('div');
+            container.className = `card-container ${isAvailable ? '' : 'unavailable'}`;
+            container.onclick = () => container.classList.toggle('flipped');
+            
+            container.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front">
+                        <h3>${d.name}</h3>
+                        <div class="public-note">${d.note || "A bartender's specialty."}</div>
+                        <p style="position:absolute; bottom:15px; right:20px; color:var(--gold); font-size:0.7rem; opacity:0.5;">Tap to view recipe</p>
+                    </div>
+                    <div class="card-back">
+                        <div class="tag-row">
+                            <span class="tag">${d.method}</span>
+                            <span class="tag">${d.glass}</span>
+                        </div>
+                        ${d.garnish ? `<div style="margin-bottom:8px;"><span class="tag">${d.garnish} GARNISH</span></div>` : ''}
+                        <ul class="spec-list">
+                            ${d.specs.map(s => `<li>${s.trim()}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            menu.appendChild(container);
+        });
+    }
+
+    // Initial load
+    fetchCocktails();
+</script>
+</body>
+</html>
