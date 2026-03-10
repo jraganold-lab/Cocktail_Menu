@@ -18,7 +18,6 @@
         header { text-align: center; border-bottom: 1px solid var(--gold); margin-bottom: 30px; }
         h1 { font-family: 'Georgia', serif; color: var(--gold); letter-spacing: 4px; text-transform: uppercase; margin: 10px 0; }
         
-        /* Smooth Fade-in Animation */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -34,7 +33,6 @@
             animation: fadeIn 0.5s ease-out forwards;
         }
 
-        /* 3D Flip Container */
         .card-container { perspective: 1000px; height: 220px; cursor: pointer; }
         .card-inner { 
             position: relative; width: 100%; height: 100%; 
@@ -51,7 +49,6 @@
         }
 
         .card-back { transform: rotateY(180deg); border-color: var(--gold); }
-
         h3 { color: var(--gold); margin: 0 0 10px 0; font-family: 'Georgia', serif; font-size: 1.4rem; }
         .public-note { font-style: italic; color: #999; font-size: 0.95rem; line-height: 1.4; }
         
@@ -61,55 +58,49 @@
         .spec-list { list-style: none; padding: 0; margin: 0; font-size: 0.9rem; line-height: 1.5; color: #fff; }
         .spec-list li { border-bottom: 1px dotted #444; }
 
-        /* --- LOADING ANIMATION STYLES --- */
+        /* --- UPDATED LOADING ANIMATION --- */
         #statusDisplay { 
-            text-align: center; 
-            color: var(--gold); 
-            padding: 80px 50px; 
-            font-family: 'Georgia', serif; 
-            font-style: italic; 
-            letter-spacing: 2px;
-            font-size: 1.2rem;
+            text-align: center; color: var(--gold); padding: 80px 50px; 
+            font-family: 'Georgia', serif; font-style: italic; letter-spacing: 2px; font-size: 1.2rem;
         }
 
-        .loader-container {
-            width: 120px;
-            height: 100px;
-            margin: 0 auto 20px;
-            position: relative;
-        }
+        .loader-container { width: 120px; height: 100px; margin: 0 auto 20px; position: relative; }
 
-        /* The Glass */
+        /* The Rocks Glass with Ice */
         .glass {
             position: absolute; bottom: 10px; left: 50%;
-            width: 34px; height: 38px;
+            width: 38px; height: 40px;
             border: 2px solid var(--gold);
             border-top: none;
-            border-radius: 2px 2px 6px 6px;
+            border-radius: 2px 2px 4px 4px;
+            border-bottom-width: 5px; /* Heavy bottom like a rocks glass */
             transform: translateX(-50%);
-            overflow: hidden; /* Clips the liquid fill */
         }
 
-        /* Liquid filling the glass */
-        .glass::after {
-            content: '';
+        /* Ice Cubes */
+        .ice {
+            position: absolute; width: 10px; height: 10px;
+            border: 1px solid var(--gold); opacity: 0.6;
+        }
+        .ice1 { bottom: 5px; left: 4px; transform: rotate(15deg); }
+        .ice2 { bottom: 6px; right: 4px; transform: rotate(-20deg); }
+        .ice3 { bottom: 14px; left: 10px; transform: rotate(45deg); }
+
+        .glass-fill {
             position: absolute; bottom: 0; left: 0; right: 0;
-            background: var(--gold);
-            height: 0%;
+            background: var(--gold); height: 0%;
             animation: fillGlass 1.5s ease-in-out infinite;
         }
 
-        /* The Shaker Tin */
+        /* The Shaker Tin - Adjusted left shift */
         .shaker {
             position: absolute; top: 5px; left: 10px;
-            width: 30px; height: 50px;
-            background: var(--gold);
-            border-radius: 4px 4px 8px 8px;
+            width: 28px; height: 48px;
+            background: var(--gold); border-radius: 3px 3px 6px 6px;
             transform-origin: top right;
             animation: pourAction 1.5s ease-in-out infinite;
         }
 
-        /* The Pouring Stream */
         .stream {
             position: absolute; top: 0; right: 0;
             width: 3px; height: 0;
@@ -120,23 +111,23 @@
         @keyframes pourAction {
             0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
             20% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-            45%, 75% { transform: translate(38px, 5px) rotate(115deg); opacity: 1; }
+            /* Changed translate from 38px to 32px to move pour to the left */
+            45%, 75% { transform: translate(32px, 5px) rotate(115deg); opacity: 1; }
             95%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
         }
 
         @keyframes streamAction {
             0%, 48% { height: 0; opacity: 0; }
-            52%, 70% { height: 50px; opacity: 1; }
+            52%, 70% { height: 52px; opacity: 1; }
             75%, 100% { height: 0; opacity: 0; }
         }
 
         @keyframes fillGlass {
             0%, 55% { height: 0%; }
-            75%, 90% { height: 60%; }
+            75%, 90% { height: 50%; }
             100% { height: 0%; }
         }
 
-        /* Admin Footer */
         .admin-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #000; padding: 20px; display: flex; justify-content: center; gap: 25px; border-top: 1px solid var(--gold); z-index: 100; }
         .admin-bar label { color: var(--gold); font-weight: bold; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
         input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); }
@@ -148,10 +139,13 @@
 
 <div id="statusDisplay">
     <div class="loader-container">
-        <div class="shaker">
-            <div class="stream"></div>
+        <div class="shaker"><div class="stream"></div></div>
+        <div class="glass">
+            <div class="ice ice1"></div>
+            <div class="ice ice2"></div>
+            <div class="ice ice3"></div>
+            <div class="glass-fill"></div>
         </div>
-        <div class="glass"></div>
     </div>
     <div>Mixing the drinks...</div>
 </div>
@@ -167,14 +161,11 @@
 
 <script>
     const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR5ACf_DF6gWGmXRVehkDrDRLcTWEG7evXGbHDk0_EGbUNpK2Owg9-r4_rZGrKlDub0H_mQNFTnxpi7/pub?output=csv';
-
     let cocktails = [];
 
     async function fetchCocktails() {
         const status = document.getElementById('statusDisplay');
         const menu = document.getElementById('menu');
-        
-        // Hide menu and show loading animation
         menu.style.display = 'none';
         menu.style.opacity = '0';
         status.style.display = 'block';
@@ -182,10 +173,7 @@
         try {
             const response = await fetch(SHEET_URL + '&cb=' + Date.now());
             const csvText = await response.text();
-            
-            // Forced 1.5 second "Mixing" delay for effect
             await new Promise(resolve => setTimeout(resolve, 1500));
-
             const rows = csvText.split('\n').slice(1);
             
             cocktails = rows.map(row => {
@@ -202,15 +190,9 @@
                 };
             }).filter(c => c.name !== "");
 
-            // Hide loader and reveal menu grid
             status.style.display = 'none';
             menu.style.display = 'grid';
-            
-            // Slight delay before opacity change to ensure animation triggers on iPad
-            setTimeout(() => {
-                menu.style.opacity = '1';
-            }, 50);
-
+            setTimeout(() => { menu.style.opacity = '1'; }, 50);
             renderMenu();
         } catch (err) {
             status.innerHTML = "Sync Error. Check Connection.";
@@ -222,7 +204,6 @@
         const hasLime = document.getElementById('checkLime').checked;
         const hasLemon = document.getElementById('checkLemon').checked;
         const hasPineapple = document.getElementById('checkPineapple').checked;
-        
         menu.innerHTML = '';
         
         cocktails.forEach(d => {
@@ -234,7 +215,6 @@
             const container = document.createElement('div');
             container.className = `card-container ${isAvailable ? '' : 'unavailable'}`;
             container.onclick = () => container.classList.toggle('flipped');
-            
             container.innerHTML = `
                 <div class="card-inner">
                     <div class="card-front">
@@ -252,13 +232,10 @@
                             ${d.specs.map(s => `<li>${s.trim()}</li>`).join('')}
                         </ul>
                     </div>
-                </div>
-            `;
+                </div>`;
             menu.appendChild(container);
         });
     }
-
-    // Initial load
     fetchCocktails();
 </script>
 </body>
